@@ -8,12 +8,14 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";  
 import "/node_modules/primeflex/primeflex.css"
+import store from './store';
 
+import { Provider } from 'react-redux';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <Provider store={store}>
+  <App />
+</Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function
