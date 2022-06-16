@@ -40,3 +40,13 @@ export const deleteCategory = async(id)=>{
         return error.response;
     }
 }
+
+export const addCategory = async(categoryRequest)=>{
+    try {
+        let response = await axiosAuth.post("/rest/api/v1/category",categoryRequest);
+        return response;
+    } catch (error) {
+        console.log("error");
+        return error.response;
+    }
+}

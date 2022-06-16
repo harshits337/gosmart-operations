@@ -6,6 +6,7 @@ const categoryState = createSlice({
         categories: [],
         selectedCategory: {},
         showSubcategoryForm: false,
+        showCategoryForm : false
     },
     reducers: {
         setCategories(state, value) {
@@ -16,6 +17,9 @@ const categoryState = createSlice({
         },
         setShowSubcategoryForm(state, value) {
             state.showSubcategoryForm  = value.payload;
+        },
+        setShowCategoryForm(state, value) {
+            state.showCategoryForm  = value.payload;
         },
     },
 });

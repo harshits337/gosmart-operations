@@ -9,10 +9,13 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { SubCategoryForm } from "./SubCategoryForm";
+import "./category.scss";
+import { CategoryForm } from "./CategoryForm";
 export const Category = () => {
     let categories = useSelector((state) => state.categoryState.categories);
     const dispatch = useDispatch();
 	let visibleSubcategoryForm = useSelector(state=>state.categoryState.showSubcategoryForm);
+	let visibleCategoryForm = useSelector(state=>state.categoryState.showCategoryForm);
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
@@ -56,7 +59,16 @@ export const Category = () => {
 
     return (
         <Fragment>
+			<div className="flex">
             <h2 className="ml-4">All Categories</h2>
+			<p className="add-button">
+				
+				<Button className="p-button-primary" label="Add" onClick={() => {
+					dispatch(categoryStateActions.setShowCategoryForm(true))
+				}}></Button>
+			</p>
+			</div>
+
             <Accordion
                 activeIndex={0}
                 style={{ padding: "1rem", width: "80%" }}
@@ -128,6 +140,15 @@ export const Category = () => {
 				onHide={() => dispatch(categoryStateActions.setShowSubcategoryForm(false))}
             >
                 <SubCategoryForm></SubCategoryForm>
+            </Dialog>
+			<Dialog
+                header="Add Category"
+                visible={visibleCategoryForm}
+                style={{ width: "20%" }}
+                modal
+				onHide={() => dispatch(categoryStateActions.setShowCategoryForm(false))}
+            >
+                <CategoryForm></CategoryForm>
             </Dialog>
         </Fragment>
     );
