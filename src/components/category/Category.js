@@ -22,7 +22,11 @@ export const Category = () => {
                 <Button
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-success mr-2"
-                    onClick={() => {}}
+                    onClick={() => {
+						console.log("row",rowData)
+						dispatch(categoryStateActions.setShowSubcategoryForm(true));
+						dispatch(categoryStateActions.setSelectedSubCategory(rowData));
+					}}
                 />
                 <Button
                     icon="pi pi-trash"
@@ -137,7 +141,10 @@ export const Category = () => {
                 visible={visibleSubcategoryForm}
                 style={{ width: "20%" }}
                 modal
-				onHide={() => dispatch(categoryStateActions.setShowSubcategoryForm(false))}
+				onHide={() => {
+					dispatch(categoryStateActions.setShowSubcategoryForm(false))
+					dispatch(categoryStateActions.setSelectedSubCategory({}))
+				}}
             >
                 <SubCategoryForm></SubCategoryForm>
             </Dialog>
@@ -146,7 +153,9 @@ export const Category = () => {
                 visible={visibleCategoryForm}
                 style={{ width: "20%" }}
                 modal
-				onHide={() => dispatch(categoryStateActions.setShowCategoryForm(false))}
+				onHide={() => {
+					dispatch(categoryStateActions.setShowCategoryForm(false))
+				}}
             >
                 <CategoryForm></CategoryForm>
             </Dialog>

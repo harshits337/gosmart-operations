@@ -50,3 +50,13 @@ export const addCategory = async(categoryRequest)=>{
         return error.response;
     }
 }
+
+export const updateSubCategory = async(categoryRequest)=>{
+    try {
+        let response = await axiosAuth.put("/rest/api/v1/subcategory",categoryRequest);
+        return response;
+    } catch (error) {
+        console.log("error");
+        return error.response;
+    }
+}

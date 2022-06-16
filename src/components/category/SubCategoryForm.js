@@ -5,17 +5,18 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addSubcategory, getAllCategories } from './category.http';
+import { addSubcategory, getAllCategories, updateSubCategory } from './category.http';
 import { categoryStateActions } from '../../store';
 
 export const SubCategoryForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     let categoryId = useSelector(state=>state.categoryState.selectedCategory?.id);
+    let subcategory = useSelector(state=>state.categoryState.selectedSubCategory);
     const formik = useFormik({
         initialValues: {
-            name: "",
-            description: "",
+            name: subcategory.name ? subcategory.name : "" ,
+            description: subcategory.description ? subcategory.description : "",
         },
         validate: (data) => {
             let errors = {};
@@ -30,11 +31,21 @@ export const SubCategoryForm = () => {
             return errors;
         },
         onSubmit: async (data) => {
-            data['categoryId'] = categoryId;
+            console.log("subcategory",subcategory,Object.keys(subcategory).length)
+            console.log(categoryId)
+            data['categoryId'] = categoryId !== undefined ? categoryId : subcategory.categoryId;
+            data["id"] = subcategory.id;
             console.log(data);
-            let response = await addSubcategory(data);
-            if(response.status === 201){
-                let response = await getAllCategories();
+            let response;
+            if(! (Object.keys(subcategory).length === 0)){
+                
+                response = await updateSubCategory(data);
+            } else {
+                response = await addSubcategory(data);
+                
+            }
+            if(response.status === 201 || response.status === 200){
+                response = await getAllCategories();
                 console.log(response);
                 if (response.status === 200) {
                     dispatch(categoryStateActions.setCategories(response.data));
@@ -43,6 +54,7 @@ export const SubCategoryForm = () => {
             } else{
                 console.log("eroror");
             }
+            
            
         },
     });
