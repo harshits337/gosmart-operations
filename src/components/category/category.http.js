@@ -30,3 +30,13 @@ export const addSubcategory = async(subCategoryRequest)=>{
         return error.response;
     }
 }
+
+export const deleteCategory = async(id)=>{
+    try {
+        let response = await axiosAuth.delete("/rest/api/v1/category/" + id);
+        return response;
+    } catch (error) {
+        console.log("error");
+        return error.response;
+    }
+}

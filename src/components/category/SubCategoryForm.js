@@ -91,7 +91,6 @@ export const SubCategoryForm = () => {
                                     name="description"
                                     value={formik.values.description}
                                     onChange={formik.handleChange}
-                                    toggleMask
                                     className={classNames({
                                         "p-invalid":
                                             isFormFieldValid("description"),

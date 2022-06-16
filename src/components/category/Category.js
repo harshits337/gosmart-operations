@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { categoryStateActions } from "../../store";
-import { deleteSubcategory, getAllCategories } from "./category.http";
+import { deleteCategory, deleteSubcategory, getAllCategories } from "./category.http";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Dialog } from "primereact/dialog";
 
@@ -13,7 +13,6 @@ export const Category = () => {
     let categories = useSelector((state) => state.categoryState.categories);
     const dispatch = useDispatch();
 	let visibleSubcategoryForm = useSelector(state=>state.categoryState.showSubcategoryForm);
-	console.log(visibleSubcategoryForm)
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
@@ -104,7 +103,15 @@ export const Category = () => {
                                         <Button
                                             label="Delete Category"
                                             className="p-button-danger m-2"
-                                            onClick={() => {}}
+                                            onClick={ async () => {
+												let response = await deleteCategory(item.id);
+												if(response.status === 200){
+													response = await getAllCategories();
+													if (response.status === 200) {
+														dispatch(categoryStateActions.setCategories(response.data));
+													}
+												}
+											}}
                                         />
                                     </div>
                                 </div>
