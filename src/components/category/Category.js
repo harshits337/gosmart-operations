@@ -1,7 +1,11 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { categoryStateActions } from "../../store";
-import { deleteCategory, deleteSubcategory, getAllCategories } from "./category.http";
+import {
+    deleteCategory,
+    deleteSubcategory,
+    getAllCategories,
+} from "./category.http";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Dialog } from "primereact/dialog";
 
@@ -14,8 +18,12 @@ import { CategoryForm } from "./CategoryForm";
 export const Category = () => {
     let categories = useSelector((state) => state.categoryState.categories);
     const dispatch = useDispatch();
-	let visibleSubcategoryForm = useSelector(state=>state.categoryState.showSubcategoryForm);
-	let visibleCategoryForm = useSelector(state=>state.categoryState.showCategoryForm);
+    let visibleSubcategoryForm = useSelector(
+        (state) => state.categoryState.showSubcategoryForm
+    );
+    let visibleCategoryForm = useSelector(
+        (state) => state.categoryState.showCategoryForm
+    );
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
@@ -23,10 +31,14 @@ export const Category = () => {
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-success mr-2"
                     onClick={() => {
-						console.log("row",rowData)
-						dispatch(categoryStateActions.setShowSubcategoryForm(true));
-						dispatch(categoryStateActions.setSelectedSubCategory(rowData));
-					}}
+                        console.log("row", rowData);
+                        dispatch(
+                            categoryStateActions.setShowSubcategoryForm(true)
+                        );
+                        dispatch(
+                            categoryStateActions.setSelectedSubCategory(rowData)
+                        );
+                    }}
                 />
                 <Button
                     icon="pi pi-trash"
@@ -63,15 +75,20 @@ export const Category = () => {
 
     return (
         <Fragment>
-			<div className="flex">
-            <h2 className="ml-4">All Categories</h2>
-			<p className="add-button">
-				
-				<Button className="p-button-primary" label="Add" onClick={() => {
-					dispatch(categoryStateActions.setShowCategoryForm(true))
-				}}></Button>
-			</p>
-			</div>
+            <div className="flex">
+                <h2 className="ml-4">All Categories</h2>
+                <p className="add-button">
+                    <Button
+                        className="p-button-primary"
+                        label="Add"
+                        onClick={() => {
+                            dispatch(
+                                categoryStateActions.setShowCategoryForm(true)
+                            );
+                        }}
+                    ></Button>
+                </p>
+            </div>
 
             <Accordion
                 activeIndex={0}
@@ -111,23 +128,40 @@ export const Category = () => {
                                             label="Add Sub Category"
                                             className="p-button-primary m-2"
                                             onClick={() => {
-												dispatch(categoryStateActions.setSelectedCategory(item));
-												dispatch(categoryStateActions.setShowSubcategoryForm(true))
-
-											}}
+                                                dispatch(
+                                                    categoryStateActions.setSelectedCategory(
+                                                        item
+                                                    )
+                                                );
+                                                dispatch(
+                                                    categoryStateActions.setShowSubcategoryForm(
+                                                        true
+                                                    )
+                                                );
+                                            }}
                                         />
                                         <Button
                                             label="Delete Category"
                                             className="p-button-danger m-2"
-                                            onClick={ async () => {
-												let response = await deleteCategory(item.id);
-												if(response.status === 200){
-													response = await getAllCategories();
-													if (response.status === 200) {
-														dispatch(categoryStateActions.setCategories(response.data));
-													}
-												}
-											}}
+                                            onClick={async () => {
+                                                let response =
+                                                    await deleteCategory(
+                                                        item.id
+                                                    );
+                                                if (response.status === 200) {
+                                                    response =
+                                                        await getAllCategories();
+                                                    if (
+                                                        response.status === 200
+                                                    ) {
+                                                        dispatch(
+                                                            categoryStateActions.setCategories(
+                                                                response.data
+                                                            )
+                                                        );
+                                                    }
+                                                }
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -141,21 +175,23 @@ export const Category = () => {
                 visible={visibleSubcategoryForm}
                 style={{ width: "20%" }}
                 modal
-				onHide={() => {
-					dispatch(categoryStateActions.setShowSubcategoryForm(false))
-					dispatch(categoryStateActions.setSelectedSubCategory({}))
-				}}
+                onHide={() => {
+                    dispatch(
+                        categoryStateActions.setShowSubcategoryForm(false)
+                    );
+                    dispatch(categoryStateActions.setSelectedSubCategory({}));
+                }}
             >
                 <SubCategoryForm></SubCategoryForm>
             </Dialog>
-			<Dialog
+            <Dialog
                 header="Add Category"
                 visible={visibleCategoryForm}
                 style={{ width: "20%" }}
                 modal
-				onHide={() => {
-					dispatch(categoryStateActions.setShowCategoryForm(false))
-				}}
+                onHide={() => {
+                    dispatch(categoryStateActions.setShowCategoryForm(false));
+                }}
             >
                 <CategoryForm></CategoryForm>
             </Dialog>
