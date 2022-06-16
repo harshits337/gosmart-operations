@@ -51,6 +51,7 @@ export const SubCategoryForm = () => {
                     dispatch(categoryStateActions.setCategories(response.data));
                 }
                 dispatch(categoryStateActions.setShowSubcategoryForm(false))
+                dispatch(categoryStateActions.setSelectedSubCategory({}))
             } else{
                 console.log("eroror");
             }
