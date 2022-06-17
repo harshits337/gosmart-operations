@@ -10,11 +10,13 @@ import { categoryStateActions, productStateActions } from "../../store";
 import { getAllCategories } from "../category/category.http";
 import { Dropdown } from "primereact/dropdown";
 import { getProductsForCategories } from "./products.http";
+import { ProductForm } from "./ProductForm";
 
 export const Products = () => {
     const dispatch = useDispatch();
     let products = useSelector((state) => state.productState.products);
     let categories = useSelector((state) => state.productState.categories);
+	let showProductform = useSelector(state=>state.productState.showProductform);
 
     useEffect(() => {
         (async () => {
@@ -61,13 +63,24 @@ export const Products = () => {
                         label="Add Product"
                         onClick={() => {
                             dispatch(
-                                categoryStateActions.setShowCategoryForm(true)
+                                productStateActions.setShowProductForm(true)
                             );
                         }}
                     ></Button>
                 </p>
 				
             </div>
+			<Dialog
+                header="Add Product"
+                visible={showProductform}
+                style={{ width: "20%" }}
+                modal
+                onHide={() => {
+                    dispatch(productStateActions.setShowProductForm(false));
+                }}
+            >
+                <ProductForm></ProductForm>
+            </Dialog>
 
         </Fragment>
     );

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from "react";
 
 import { useFormik } from "formik";
 import { InputText } from "primereact/inputtext";
@@ -6,46 +6,65 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { addProduct, getProductsForCategories } from "./products.http";
+import { productStateActions } from "../../store";
+import { Dropdown } from "primereact/dropdown";
 
 export const ProductForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    let categories = useSelector((state) => state.productState.categories);
+    const [subcategories,setSubcategories] = useState([]);
     const formik = useFormik({
         initialValues: {
             name: "",
-            brand : "",
+            brand: "",
             details: "",
-            price : "",
+            price: "",
             categoryId : "",
-            subcategoryId
+            subCategoryId : ""
         },
         validate: (data) => {
             let errors = {};
-
+            if (!data.brand) {
+                errors.brand = "Brand is required.";
+            }
             if (!data.name) {
                 errors.name = "Name is required.";
             }
-            if (!data.description) {
+            if (!data.price) {
                 errors.description = "Description is required.";
+            }
+            
+            if (!data.categoryId) {
+                errors.categoryId = "Category is required.";
+            }
+            
+            if (!data.subCategoryId) {
+                errors.subCategoryId = "Subcategory is required.";
+            }
+            if (!data.price) {
+                errors.price = "Prices is required.";
+            }
+            if (!data.details) {
+                errors.details = "Details is required.";
             }
 
             return errors;
         },
         onSubmit: async (data) => {
-            data['categoryId'] = categoryId;
             console.log(data);
-            let response = await addCategory(data);
-            if(response.status === 201){
-                let response = await getAllCategories();
+            let response = await addProduct(data);
+            if (response.status === 201) {
+                let response = await getProductsForCategories(data.categoryId);
                 console.log(response);
                 if (response.status === 200) {
-                    dispatch(categoryStateActions.setCategories(response.data));
+                    dispatch(productStateActions.setProducts(response.data));
                 }
-                dispatch(categoryStateActions.setShowCategoryForm(false))
-            } else{
+                dispatch(productStateActions.setShowProductForm(false));
+            } else {
                 console.log("eroror");
             }
-           
         },
     });
     const isFormFieldValid = (name) =>
@@ -59,6 +78,153 @@ export const ProductForm = () => {
     };
     return (
         <div className="form-demo">
-            
+            <div className="flex ">
+                <div style={{ width: "100% " }}>
+                    <form onSubmit={formik.handleSubmit} className="p-fluid">
+                        <div className="field">
+                            <span className="p-float-label">
+                                <InputText
+                                    id="brand"
+                                    name="brand"
+                                    value={formik.values.brand}
+                                    onChange={formik.handleChange}
+                                    autoFocus
+                                    className={classNames({
+                                        "p-invalid": isFormFieldValid("brand"),
+                                    })}
+                                />
+                                <label
+                                    htmlFor="brand"
+                                    className={classNames({
+                                        "p-error": isFormFieldValid("brand"),
+                                    })}
+                                >
+                                    Brand Name*
+                                </label>
+                            </span>
+                            {getFormErrorMessage("brand")}
+                        </div>
+                        <div className="field">
+                            <span className="p-float-label">
+                                <InputText
+                                    id="name"
+                                    name="name"
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    autoFocus
+                                    className={classNames({
+                                        "p-invalid": isFormFieldValid("name"),
+                                    })}
+                                />
+                                <label
+                                    htmlFor="name"
+                                    className={classNames({
+                                        "p-error": isFormFieldValid("name"),
+                                    })}
+                                >
+                                    Product Name*
+                                </label>
+                            </span>
+                            {getFormErrorMessage("name")}
+                        </div>
+                        <div className="field">
+                            <Dropdown
+                                optionLabel="name"
+                                optionValue="id"
+                                id="categoryId"
+                                name="categoryId"
+                                value={formik.values.categoryId}
+                                options={categories}
+                                onChange={(e)=>{
+                                    formik.handleChange(e);
+                                    let subCategories;
+                                    categories.forEach(element=>{
+                                        if(element.id === e.value){
+                                            subCategories =  element.subCategories;
+                                        }
+                                    })
+                                    setSubcategories(subCategories);
+                                    
+                                }}
+                                placeholder="Select a Category"
+                                className={classNames({
+                                    "p-error": isFormFieldValid("categoryId"),
+                                })}
+                                
+                            />
+                        </div>
+                        <div className="field">
+                            <Dropdown
+                                optionLabel="name"
+                                optionValue="id"
+                                id="subCategoryId "
+                                name="subCategoryId"
+                                value={formik.values.subCategoryId}
+                                options={subcategories}
+                                onChange={formik.handleChange}
+                                placeholder="Select a Sub Category"
+                                className={classNames({
+                                    "p-error": isFormFieldValid("subCategoryId"),
+                                })}
+                                
+                            />
+                        </div>
+                        <div className="field">
+                            <span className="p-float-label">
+                                <InputText
+                                    id="details"
+                                    name="details"
+                                    value={formik.values.details}
+                                    onChange={formik.handleChange}
+                                    className={classNames({
+                                        "p-invalid":
+                                            isFormFieldValid("details"),
+                                    })}
+                                />
+                                <label
+                                    htmlFor="details"
+                                    className={classNames({
+                                        "p-error": isFormFieldValid("details"),
+                                    })}
+                                >
+                                    Product Details*
+                                </label>
+                            </span>
+                            {getFormErrorMessage("details")}
+                        </div>
+
+                        <div className="field">
+                            <span className="p-float-label">
+                                <InputText
+                                    id="price"
+                                    name="price"
+                                    value={formik.values.price}
+                                    onChange={formik.handleChange}
+                                    autoFocus
+                                    className={classNames({
+                                        "p-invalid": isFormFieldValid("price"),
+                                    })}
+                                />
+                                <label
+                                    htmlFor="name"
+                                    className={classNames({
+                                        "p-error": isFormFieldValid("price"),
+                                    })}
+                                >
+                                    Price*
+                                </label>
+                            </span>
+                            {getFormErrorMessage("price")}
+                        </div>
+
+                        <Button
+                            type="submit"
+                            label="Add Product"
+                            className="mt-2"
+                        />
+                    </form>
+                </div>
+            </div>
         </div>
     );
+};
