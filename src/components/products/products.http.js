@@ -19,3 +19,24 @@ export const addProduct = async(productRequest)=>{
         return error;
     }
 }
+
+export const updateProduct = async(updateProductRequest)=>{
+    try {
+        let response = await axiosAuth.put('/rest/api/v1/products',updateProductRequest);
+        return response;
+    } catch (error) {
+        console.log(error);
+        return error.response;
+        
+    }
+}
+
+export const deleteProduct = async(id)=>{
+    try {
+        let response = await axiosAuth.delete("/rest/api/v1/products/"+id);
+        return response;
+    } catch (error) {
+        return error.response;
+        
+    }
+}

@@ -6,23 +6,38 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct, getProductsForCategories } from "./products.http";
+import { addProduct, getProductsForCategories, updateProduct } from "./products.http";
 import { productStateActions } from "../../store";
 import { Dropdown } from "primereact/dropdown";
 
 export const ProductForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const editMode = useSelector((state) => state.productState.productEditMode);
     let categories = useSelector((state) => state.productState.categories);
-    const [subcategories,setSubcategories] = useState([]);
+    let selectedProduct = useSelector(
+        (state) => state.productState.selectedProduct
+    );
+
+    const [subcategories, setSubcategories] = useState([]);
+    if (editMode) {
+        let subCategoriesList;
+        categories.forEach((element) => {
+            if (element.id === selectedProduct.categoryId) {
+                subCategoriesList = element.subCategories;
+            }
+        });
+        setSubcategories(subCategoriesList);
+        dispatch(productStateActions.setProductEditMode(false))
+    }
     const formik = useFormik({
         initialValues: {
-            name: "",
-            brand: "",
-            details: "",
-            price: "",
-            categoryId : "",
-            subCategoryId : ""
+            name: editMode ? selectedProduct.name : "",
+            brand: editMode ? selectedProduct.brand : "",
+            details: editMode ? selectedProduct.details : "",
+            price: editMode ? selectedProduct.price : "",
+            categoryId: editMode ? selectedProduct.categoryId : "",
+            subCategoryId: editMode ? selectedProduct.subCategoryId : "",
         },
         validate: (data) => {
             let errors = {};
@@ -35,11 +50,11 @@ export const ProductForm = () => {
             if (!data.price) {
                 errors.description = "Description is required.";
             }
-            
+
             if (!data.categoryId) {
                 errors.categoryId = "Category is required.";
             }
-            
+
             if (!data.subCategoryId) {
                 errors.subCategoryId = "Subcategory is required.";
             }
@@ -54,8 +69,15 @@ export const ProductForm = () => {
         },
         onSubmit: async (data) => {
             console.log(data);
-            let response = await addProduct(data);
-            if (response.status === 201) {
+            let productResponse ;
+            if((Object.keys(selectedProduct).length === 0)){
+                productResponse = await addProduct(data);
+            } else {
+                data['id'] = selectedProduct['id'];
+                productResponse = await updateProduct(data);
+            }
+            
+            if (productResponse.status === 201 || productResponse.status === 200) {
                 let response = await getProductsForCategories(data.categoryId);
                 console.log(response);
                 if (response.status === 200) {
@@ -88,7 +110,6 @@ export const ProductForm = () => {
                                     name="brand"
                                     value={formik.values.brand}
                                     onChange={formik.handleChange}
-                                    autoFocus
                                     className={classNames({
                                         "p-invalid": isFormFieldValid("brand"),
                                     })}
@@ -111,7 +132,6 @@ export const ProductForm = () => {
                                     name="name"
                                     value={formik.values.name}
                                     onChange={formik.handleChange}
-                                    autoFocus
                                     className={classNames({
                                         "p-invalid": isFormFieldValid("name"),
                                     })}
@@ -135,22 +155,21 @@ export const ProductForm = () => {
                                 name="categoryId"
                                 value={formik.values.categoryId}
                                 options={categories}
-                                onChange={(e)=>{
+                                onChange={(e) => {
                                     formik.handleChange(e);
                                     let subCategories;
-                                    categories.forEach(element=>{
-                                        if(element.id === e.value){
-                                            subCategories =  element.subCategories;
+                                    categories.forEach((element) => {
+                                        if (element.id === e.value) {
+                                            subCategories =
+                                                element.subCategories;
                                         }
-                                    })
+                                    });
                                     setSubcategories(subCategories);
-                                    
                                 }}
                                 placeholder="Select a Category"
                                 className={classNames({
                                     "p-error": isFormFieldValid("categoryId"),
                                 })}
-                                
                             />
                         </div>
                         <div className="field">
@@ -164,9 +183,9 @@ export const ProductForm = () => {
                                 onChange={formik.handleChange}
                                 placeholder="Select a Sub Category"
                                 className={classNames({
-                                    "p-error": isFormFieldValid("subCategoryId"),
+                                    "p-error":
+                                        isFormFieldValid("subCategoryId"),
                                 })}
-                                
                             />
                         </div>
                         <div className="field">
@@ -200,7 +219,6 @@ export const ProductForm = () => {
                                     name="price"
                                     value={formik.values.price}
                                     onChange={formik.handleChange}
-                                    autoFocus
                                     className={classNames({
                                         "p-invalid": isFormFieldValid("price"),
                                     })}
