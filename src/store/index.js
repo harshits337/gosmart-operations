@@ -60,13 +60,36 @@ const productState = createSlice({
     }
 })
 
+const orderState = createSlice({
+    name : "orderState",
+    initialState : {
+        orders : [],
+        selectedOrder : {},
+        showUpdateOrderForm : false
+    },
+    reducers : {
+        setOrders(state,value){
+            state.orders = value.payload;
+        },
+        setSelectedOrder(state,value){
+            state.selectedOrder = value.payload;
+        },
+        setShowUpdateOrderForm(state,value){
+            state.showUpdateOrderForm = value.payload;
+        }
+    }
+})
+
 const store = configureStore({
     reducer: {
         categoryState: categoryState.reducer,
-        productState : productState.reducer
+        productState : productState.reducer,
+        orderState : orderState.reducer
     },
 });
 
 export const categoryStateActions = categoryState.actions;
 export const productStateActions = productState.actions;
+export const orderStateActions = orderState.actions;
+
 export default store;
