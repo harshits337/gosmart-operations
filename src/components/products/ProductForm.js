@@ -6,9 +6,10 @@ import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct, getProductsForCategories, updateProduct } from "./products.http";
+import { addImageToProduct, addProduct, getProductsForCategories, updateProduct } from "./products.http";
 import { productStateActions } from "../../store";
 import { Dropdown } from "primereact/dropdown";
+
 
 export const ProductForm = () => {
     const dispatch = useDispatch();
@@ -38,6 +39,7 @@ export const ProductForm = () => {
             price: editMode ? selectedProduct.price : "",
             categoryId: editMode ? selectedProduct.categoryId : "",
             subCategoryId: editMode ? selectedProduct.subCategoryId : "",
+            image : ''
         },
         validate: (data) => {
             let errors = {};
@@ -69,9 +71,14 @@ export const ProductForm = () => {
         },
         onSubmit: async (data) => {
             console.log(data);
+            let imagePath = data.image;
+            delete data.image;
             let productResponse ;
             if((Object.keys(selectedProduct).length === 0)){
                 productResponse = await addProduct(data);
+                const formData = new FormData();
+                formData.append('image', imagePath);
+                await addImageToProduct(formData,productResponse.data.value.id);
             } else {
                 data['id'] = selectedProduct['id'];
                 productResponse = await updateProduct(data);
@@ -84,6 +91,7 @@ export const ProductForm = () => {
                     dispatch(productStateActions.setProducts(response.data));
                 }
                 dispatch(productStateActions.setShowProductForm(false));
+                dispatch(productStateActions.setSelectedProduct({}))
             } else {
                 console.log("eroror");
             }
@@ -234,6 +242,12 @@ export const ProductForm = () => {
                             </span>
                             {getFormErrorMessage("price")}
                         </div>
+                        {Object.keys(selectedProduct).length === 0 ? <div className="field">
+                            <input type="file" id="image" name="image"  onChange={(e) => {
+                                console.log(e.target.files);
+                                formik.values.image = e.target.files[0];
+                                }} />
+                            </div> : ""}
 
                         <Button
                             type="submit"
